@@ -1,53 +1,81 @@
-import time
+# https://adventofcode.com/2020/day/11
 
-
-def get_immediate_neighbors(puzzle, r, i):
-    neigh_diffs = [(-1, -1), (-1, 0), (-1, 1), (0, -1),
-                   (0, 1), (1, -1), (1, 0), (1, 1)]
-    return [puzzle[r + d[0]][i + d[1]] for d in neigh_diffs
-            if 0 <= r + d[0] < len(puzzle)
-            and 0 <= i + d[1] < len(puzzle[r])]
-
-
-def get_view_neighbors(puzzle, r, i):
-    neigh_diffs = [(-1, -1), (-1, 0), (-1, 1), (0, -1),
-                   (0, 1), (1, -1), (1, 0), (1, 1)]
-    neighs = []
-    for d in neigh_diffs:
-        id_r = r + d[0]
-        id_s = i + d[1]
-        while 0 <= id_r < len(puzzle) and 0 <= id_s < len(puzzle[r]) and puzzle[id_r][id_s] == '.':
-            id_r += d[0]
-            id_s += d[1]
-        if 0 <= id_r < len(puzzle) and 0 <= id_s < len(puzzle[r]):
-            neighs.append(puzzle[id_r][id_s])
-    return neighs
-
-
-def wait_for_seated(puzzle, get_neigh, max_neigh):
-    change = True
-    while change:
-        change = False
-        new_puzzle = [r.copy() for r in puzzle]
-        for r in range(0, len(puzzle)):
-            row = puzzle[r]
-            for i in range(0, len(row)):
-                if row[i] == ".":
-                    continue
-                neighs = get_neigh(puzzle, r, i)
-                if row[i] == "L" and neighs.count("#") == 0:
-                    new_puzzle[r][i] = "#"
-                    change = True
-                elif row[i] == "#" and neighs.count("#") > max_neigh:
-                    new_puzzle[r][i] = "L"
-                    change = True
-        puzzle = [r.copy() for r in new_puzzle]
-    return ''.join([''.join(r) for r in puzzle]).count('#')
+moves = [(0, 1), (1, 0), (0, -1), (-1, 0),
+         (1, 1), (1, -1), (-1, 1), (-1, -1)]
 
 
 def first(data):
-    return wait_for_seated(data, get_immediate_neighbors, 3)
+    h, w = len(data), len(data[0])
+
+    hasChanged = True
+    while hasChanged:
+        newSeats = [l[:] for l in data]
+        hasChanged = False
+        for a in range(h):
+            for b in range(w):
+                n = 0
+                for da, db in moves:
+                    if da == 0 and db == 0:
+                        continue
+
+                    if 0 <= a+da < h and 0 <= b+db < w:
+                        if data[a+da][b+db] == "#":
+                            n += 1
+
+                if data[a][b] == "L" and n == 0:
+                    newSeats[a][b] = "#"
+                    hasChanged = True
+                elif data[a][b] == "#" and n >= 4:
+                    newSeats[a][b] = "L"
+                    hasChanged = True
+
+        data = newSeats
+
+    return sum(l.count("#") for l in data)
 
 
 def second(data):
-    return wait_for_seated(data, get_view_neighbors, 4)
+
+    h, w = len(data), len(data[0])
+
+    hasChanged = True
+    while hasChanged:
+        hasChanged = False
+        newSeats = [l[:] for l in data]
+        for a in range(h):
+            for b in range(w):
+                n = 0
+                for da, db in moves:
+                    ca, cb = a, b
+                    while 0 <= ca+da < h and 0 <= cb+db < w:
+                        ca += da
+                        cb += db
+
+                        if data[ca][cb] == "#":
+                            n += 1
+
+                        if data[ca][cb] != ".":
+                            break
+
+                if data[a][b] == "L" and n == 0:
+                    newSeats[a][b] = "#"
+                    hasChanged = True
+                elif data[a][b] == "#" and n >= 5:
+                    newSeats[a][b] = "L"
+                    hasChanged = True
+
+        data = newSeats
+
+    return sum(l.count("#") for l in data)
+
+
+def readFile(path):
+    data = [line.strip() for line in open(path, 'r')]
+    seats = [l[:] for l in [list(l) for l in data]]
+    return seats
+
+
+def main(path):
+    data = readFile(path)
+    print(f"First: {first(data)}")
+    print(f"Second: {second(data)}")
