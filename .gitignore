@@ -1,0 +1,8 @@
+*.pyc
+__pycache__/
+.DS_Store
+tempCodeRunnerFile
+tempCodeRunnerFile.*1
+env/
+.ini
+*.jar
