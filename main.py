@@ -14,7 +14,7 @@ day = 13
 
 
 def main():
-    m = load_module(f'y{year}.d{day}')
+    m = load_module(f'y{year}.d{day:02d}')
     m.main(f"y{year}/input/{day}.txt")
 
 
