@@ -1,29 +1,34 @@
+# https://adventofcode.com/2020/day/9
+
+import itertools
+
 def first(data):
+    for i in range(25, len(data)):
+        p = data[i-25:i]
+        v = {-1}
+        for a in p:
+            v |= {a+b for b in p if a != b}
+        if not data[i] in v:
+            return data[i]
 
-    data.append(0)
-    data.append(max(data) + 3)
-    data.sort()
 
-    ones = sum([data[i + 1] - data[i] == 1 for i in range(len(data) - 1)])
-    threes = sum([data[i + 1] - data[i] == 3 for i in range(len(data) - 1)])
+def second(data, first):
+    for i in range(len(data)):
+        sum = 0
+        k = i
+        while sum < first:
+            sum += data[k]
+            k += 1
+        if sum == first:
+            return min(data[i:k]) + max(data[i:k])
 
-    return ones*threes
 
-def second(data):
+def readFile(path):
+    data = [int(line.strip()) for line in open(path, 'r')]
+    return data
 
-    max_list = max(data) + 3
-    data.append(max_list)
-    data.append(0)
-    data = sorted(data, reverse=True)
 
-    to_end = {max_list: 1}
-
-    for item in data[1:]:
-        total = 0
-        for i in range(3):
-            if item + i + 1 in to_end:
-                total += to_end[item + i + 1]
-
-        to_end[item] = total
-
-    return to_end[0]
+def main(path):
+    data = readFile(path)
+    print(f"First: {first(data)}")
+    print(f"Second: {second(data, first(data))}")
