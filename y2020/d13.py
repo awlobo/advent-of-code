@@ -1,5 +1,4 @@
 # https://adventofcode.com/2020/day/13
-
 import math
 
 
@@ -13,18 +12,15 @@ def first(start, buses):
     return min_bus * min_arrival
 
 
-def second(start, buses):
+def second(buses):
     M = math.prod(b for b in buses if b is not None)
     result = 0
-
     for i, b in enumerate(buses):
         if b is None:
             continue
-
         Mi = M // b
         mi = pow(Mi, -1, b)
         result += (-i) * Mi * mi
-
     return result % M
 
 
@@ -38,4 +34,4 @@ def readFile(path):
 def main(path):
     start, buses = readFile(path)
     print(f"First: {first(start, buses)}")
-    print(f"Second: {second(start, buses)}")
+    print(f"Second: {second(buses)}")
